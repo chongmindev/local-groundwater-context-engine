@@ -1,9 +1,19 @@
 # Local Groundwater Context Engine  
 Chong Min
 ## Overview
-This project aggregates nearby groundwater well measurements to produce a simple, interpretable estimate of local groundwater trends and conditions.
+This project builds an end-to-end system that ingests groundwater well data and transforms it into simple, interpretable signals for decision-making.
+
+It focuses on turning messy environmental time series data into clear indicators of local groundwater trends and confidence.
+## Live Demo
+https://chongmindev.github.io/local-groundwater-context-engine/map.html
 ## Current Functionalities
-Currently, the system supports ingestion of groundwater level data from the API, retrieval of measurements by site, and computation of per-site trends and confidence scores. 
+- Data ingestion from public API into local database
+
+- Per-site data retrieval and querying
+
+- Computation of groundwater trend (score) and data reliability (confidence)
+
+- Geospatial visualization of wells across California
 
 ## Data Source
 Data from the California Department of Water Resources (DWR)  
