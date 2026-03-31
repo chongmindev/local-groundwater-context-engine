@@ -1,11 +1,27 @@
 from src.access.get_measurements import get_measurements_by_site
 from datetime import datetime, timedelta
 
-EXPECTED_PER_YEAR = 12
 ACTIVE_CUTOFF = datetime(2024, 1, 1)
+GWE_CHANGE_THRESHOLD = 2
 
 def parse_date(msmt_date):
     return datetime.strptime(msmt_date, "%Y-%m-%dT%H:%M:%S")
+
+def classify_trend(site_score):
+    if site_score > GWE_CHANGE_THRESHOLD:
+        return "🟢 Improving"
+    elif site_score < -GWE_CHANGE_THRESHOLD:
+        return "🔴 Declining"
+    else:
+        return "🟡 Stable"
+
+def classify_confidence(site_confidence):
+    if site_confidence >= 8:
+        return "🟢 High"
+    elif site_confidence >= 5:
+        return "🟡 Moderate"
+    else:
+        return "🔴 Low"
 
 def compute_site_stats(site_code):
     rows = get_measurements_by_site(site_code)
@@ -38,7 +54,7 @@ def compute_site_stats(site_code):
     past_avg = sum(past) / len(past)
 
     score = recent_avg - past_avg
-    confidence = min(len(recent), len(past)) / EXPECTED_PER_YEAR
+    confidence = len(recent) + len(past)
 
     return score, confidence
 

@@ -1,7 +1,7 @@
 import folium
 from folium.plugins import MarkerCluster
 from src.access.get_measurements import get_site_codes
-from src.compute.site_stats import compute_site_stats
+from src.compute.site_stats import compute_site_stats, classify_trend, classify_confidence
 import random
 
 SEED_RANDOM = 42
@@ -31,18 +31,25 @@ def get_limited_site_codes(limit=MAX_MARKERS):
 
     return valid_site_codes
 
+def get_marker_msg(site_code, trend, site_score, confidence_label, site_confidence):
+    if site_score is not None and site_confidence is not None:
+        return (
+            f"Site: {site_code}\n"
+            f"Status: {trend}\n"
+            f"Change: {site_score:.2f} ft over last 12 months\n"
+            f"Confidence: {confidence_label} ({site_confidence} obs)"
+        )
+    else:
+        return f"Site: {site_code}\nInsufficient data"
+
 def add_site_marker(marker_cluster, site_code):
     coords = parse_coordinates(site_code)
 
     site_score, site_confidence = compute_site_stats(site_code)
+    trend = classify_trend(site_score)
+    confidence_label = classify_confidence(site_confidence)
 
-    popup_text = f"Site code: {site_code}\n"
-
-    if site_score is not None and site_confidence is not None:
-        popup_text += f"Score: {site_score:.2f}\n"
-        popup_text += f"Confidence: {site_confidence:.2f}"
-    else:
-        popup_text += "Score: N/A\nConfidence: N/A"
+    popup_text = get_marker_msg(site_code, trend, site_score, confidence_label, site_confidence)
 
     folium.Marker(
         location=coords,
