@@ -15,9 +15,9 @@ Each well is summarized as:
 The system is structured into modular layers:
 
 - **Ingestion**: Fetches groundwater data from external APIs
-- **Storage**: Stores time-series data locally for querying
-- **Computation**: Derives trend and confidence signals per site
-- **Visualization**: Displays results on an interactive map
+- **Access**: Handles retrieval and querying from the local database
+- **Compute**: Derives per-site trend and confidence signals
+- **Visualization**: Displays results on an interactive geospatial map
 
 This separation allows the system to handle messy data while keeping computation and presentation cleanly decoupled.
 
