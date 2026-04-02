@@ -68,7 +68,7 @@ def draw_map():
     for site_code in get_limited_site_codes():
         add_site_marker(marker_cluster, site_code)
 
-    m.save("output/map.html")
+    m.save("docs/index.html")
 
 if __name__ == "__main__":
     draw_map()

@@ -30,7 +30,7 @@ The system prioritizes interpretability and robustness over model complexity, fo
 ![Groundwater Map](demo_map.png)
 
 ## Live Demo
-[View Interactive Map](https://chongmindev.github.io/local-groundwater-context-engine/map.html)
+[View Interactive Map](https://chongmindev.github.io/local-groundwater-context-engine/index.html)
 
 ## Features
 - Ingests groundwater measurements from public APIs into a local database
