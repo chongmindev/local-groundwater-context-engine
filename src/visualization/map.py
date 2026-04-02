@@ -4,18 +4,14 @@ from src.access.get_measurements import get_site_codes
 from src.compute.site_stats import compute_site_stats, classify_trend, classify_confidence
 import random
 
-SEED_RANDOM = 42
-MAX_MARKERS = 4000
 
 def parse_coordinates(site_code):
     lat = int(site_code[0:6]) / 10000.0
     lon = -int(site_code[7:14]) / 10000.0
     return [lat, lon]
 
-def get_limited_site_codes(limit=MAX_MARKERS):
+def get_limited_site_codes():
     site_codes = get_site_codes()
-    random.seed(SEED_RANDOM)
-    random.shuffle(site_codes)
     valid_site_codes = []
 
     for site_code in site_codes:
@@ -25,9 +21,6 @@ def get_limited_site_codes(limit=MAX_MARKERS):
             continue
 
         valid_site_codes.append(site_code)
-
-        if len(valid_site_codes) >= limit:
-            break
 
     return valid_site_codes
 
