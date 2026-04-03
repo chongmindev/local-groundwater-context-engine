@@ -1,5 +1,6 @@
 # Local Groundwater Context Engine  
 **Chong Min**
+
 ## Overview
 This project builds an end-to-end data system that transforms raw groundwater well measurements into interpretable, decision-oriented signals.
 
@@ -14,7 +15,7 @@ Each well is summarized as:
 ## System Design
 The system is structured into modular layers:
 
-- **Ingestion**: Fetches groundwater data from external APIs
+- **Ingestion**: Fetches groundwater data from external APIs incrementally
 - **Access**: Handles retrieval and querying from the local database
 - **Compute**: Derives per-site trend and confidence signals
 - **Visualization**: Displays results on an interactive geospatial map
@@ -26,6 +27,13 @@ Processes ~6M rows of groundwater measurements
 
 The system prioritizes interpretability and robustness over model complexity, focusing on reliable signals from imperfect real-world data.
 
+## Data Pipeline & Automation
+- Incremental ingestion using CKAN API (`msmt_date > latest_date`)  
+- Metadata table tracks last ingestion timestamp  
+- Appends new rows using `ON CONFLICT DO NOTHING` to avoid duplicates  
+- GitHub Actions runs ingestion every 12 hours (UTC 00:00 and 12:00)  
+- Map visualization automatically regenerates after each ingestion  
+
 ## Demo Preview
 ![Groundwater Map](demo_map.png)
 
@@ -33,15 +41,16 @@ The system prioritizes interpretability and robustness over model complexity, fo
 [View Interactive Map](https://chongmindev.github.io/local-groundwater-context-engine/index.html)
 
 ## Features
-- Ingests groundwater measurements from public APIs into a local database
+- Incremental ingestion from public groundwater APIs
 - Computes per-site groundwater trends (change over time)
 - Assigns confidence levels based on data availability
-- Handles uneven and incomplete real-world data
-- Visualizes results on an interactive geospatial map
+- Robust handling of missing or uneven real-world data
+- Interactive spatial visualization of local groundwater status
+- Displays last updated time relative to most recent 12-hour cycle
 
 ## Motivation
 Groundwater data is often fragmented, uneven, and difficult to interpret directly.  
-This project focuses on converting raw measurements into simple signals that can support local understanding and decision-making.
+This project converts raw measurements into simple, actionable signals to support local understanding and decision-making.
 
 ## Data Source
 Data from the California Department of Water Resources (DWR)  
