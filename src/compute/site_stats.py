@@ -2,6 +2,7 @@ from src.access.get_measurements import get_measurements_by_site
 from datetime import datetime, timedelta
 
 ACTIVE_CUTOFF = datetime(2024, 1, 1)
+SGMA_DATE = datetime(2014, 9, 16)
 GWE_CHANGE_THRESHOLD = 2
 
 def parse_date(msmt_date):
@@ -16,9 +17,9 @@ def classify_trend(site_score):
         return "🟡 Stable"
 
 def classify_confidence(site_confidence):
-    if site_confidence >= 8:
+    if site_confidence >= 20:
         return "🟢 High"
-    elif site_confidence >= 5:
+    elif site_confidence >= 10:
         return "🟡 Moderate"
     else:
         return "🔴 Low"
@@ -41,20 +42,20 @@ def compute_site_stats(site_code):
 
     today = latest_date
 
-    recent_cutoff = today - timedelta(days=365)
-    past_cutoff = today - timedelta(days=365 * 2)
+    recent_cutoff = SGMA_DATE
+    past_cutoff = SGMA_DATE - timedelta(days=(today - SGMA_DATE).days)
 
     recent = [gwe for d, gwe in parsed if d >= recent_cutoff]
     past = [gwe for d, gwe in parsed if past_cutoff <= d < recent_cutoff]
 
-    if len(recent) == 0 or len(past) == 0:
+    if len(recent) < 5 or len(past) < 5:
         return None, None
 
     recent_avg = sum(recent) / len(recent)
     past_avg = sum(past) / len(past)
 
     score = recent_avg - past_avg
-    confidence = len(recent) + len(past)
+    confidence = min(len(recent),len(past))
 
     return score, confidence
 

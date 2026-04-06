@@ -30,7 +30,7 @@ def get_marker_msg(site_code, trend, site_score, confidence_label, site_confiden
             f"Site: {site_code}\n"
             f"Status: {trend}\n"
             f"Change: {site_score:.2f} ft over last 12 months\n"
-            f"Confidence: {confidence_label} ({site_confidence} obs)"
+            f"Confidence: {confidence_label} ({site_confidence} bottleneck obs)"
         )
     else:
         return f"Site: {site_code}\nInsufficient data"

@@ -9,8 +9,9 @@ It ingests real-world environmental data, computes per-site trends and confidenc
 ## Signal Definition
 Each well is summarized as:
 - Status (Improving / Stable / Declining)
-- Change in groundwater level over time
+- Change in groundwater level over time (comparing pre- vs post-SGMA periods)
 - Confidence based on data availability
+Signals reflect how groundwater levels have changed across policy-relevant timeframes, rather than short-term fluctuations.
 
 ## System Design
 The system is structured into modular layers:
@@ -42,15 +43,17 @@ The system prioritizes interpretability and robustness over model complexity, fo
 
 ## Features
 - Incremental ingestion from public groundwater APIs
-- Computes per-site groundwater trends (change over time)
+- Computes per-site groundwater trends using pre- vs post-SGMA comparison
 - Assigns confidence levels based on data availability
+- Assigns confidence levels based on minimum observations across time windows
+- Filters out wells with insufficient data to avoid noisy signals
 - Robust handling of missing or uneven real-world data
 - Interactive spatial visualization of local groundwater status
 - Displays last updated time relative to most recent 12-hour cycle
 
 ## Motivation
-Groundwater data is often fragmented, uneven, and difficult to interpret directly.  
-This project converts raw measurements into simple, actionable signals to support local understanding and decision-making.
+Groundwater data is often fragmented, uneven, and difficult to interpret directly.
+This project converts raw measurements into simple, actionable signals to support local understanding and decision-making, including evaluating long-term changes in groundwater conditions.
 
 ## Data Source
 Data from the California Department of Water Resources (DWR)  
