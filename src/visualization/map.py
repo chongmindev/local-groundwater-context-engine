@@ -3,7 +3,12 @@ from folium.plugins import MarkerCluster
 from src.access.get_measurements import get_site_codes
 from src.compute.site_stats import compute_site_stats, classify_trend, classify_confidence
 import random
+import datetime
+import sqlite3
+from pathlib import Path
 
+DB_PATH = Path(__file__).resolve().parents[2] / "groundwater.db"
+INDEX_PATH = Path(__file__).resolve().parents[2] / "docs/index.html"
 
 def parse_coordinates(site_code):
     lat = int(site_code[0:6]) / 10000.0
@@ -70,5 +75,41 @@ def draw_map():
 
     m.save("docs/map.html")
 
-if __name__ == "__main__":
+def update_index_html():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    latest_date = cur.execute("""
+    SELECT value FROM metadata WHERE key = 'latest_date'
+    """).fetchone()
+
+    if latest_date is None or latest_date[0] is None:
+        updated_text = "Update unavailable"
+    else:
+        latest_dt = datetime.datetime.fromisoformat(latest_date[0])
+        now = datetime.datetime.now()
+        delta = (now.date() - latest_dt.date()).days
+
+        if delta == 0:
+            updated_text = "Updated today"
+        elif delta == 1:
+            updated_text = "Updated yesterday"
+        else:
+            updated_text = f"Updated {delta} days ago"
+
+    with open(INDEX_PATH, "r") as f:
+        html = f.read()
+
+    html = html.replace("LAST_UPDATED_PLACEHOLDER", updated_text)
+
+    with open(INDEX_PATH, "w") as f:
+        f.write(html)
+
+    conn.close()
+
+def main():
     draw_map()
+    update_index_html()
+
+if __name__ == "__main__":
+    main()

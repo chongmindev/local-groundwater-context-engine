@@ -155,27 +155,10 @@
     </div>
   </div>
 
-  <div class="last-updated" data-timestamp="2026-04-02T08:00:00Z">
+  <div class="last-updated">
     <strong>Last Updated</strong>
-    <span id="hours-ago"></span>
-    </div>
-
-    <script>
-        const elem = document.getElementById("hours-ago");
-
-        const now = new Date();
-        const hour = now.getUTCHours();
-        const cycleHour = hour >= 12 ? 12 : 0;
-        const lastCycle = new Date(Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate(),
-            cycleHour, 0, 0
-        ));
-
-        const hours = Math.floor((now - lastCycle) / (1000*60*60));
-        elem.textContent = `${hours} hours ago`;
-    </script>
+    <span id="last-updated-text">Updated today</span>
+  </div>
 
   <iframe src="map.html"></iframe>
 
