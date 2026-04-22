@@ -2,57 +2,63 @@ import folium
 from folium.plugins import MarkerCluster
 from src.access.get_measurements import get_site_codes
 from src.compute.site_stats import compute_site_stats, classify
-import random
 import datetime
 import sqlite3
 from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parents[2] / "groundwater.db"
 INDEX_PATH = Path(__file__).resolve().parents[2] / "docs/index.html"
+MAP_PATH = Path(__file__).resolve().parents[2] / "docs/map.html"
+
 
 def parse_coordinates(site_code):
     lat = int(site_code[0:6]) / 10000.0
     lon = -int(site_code[7:14]) / 10000.0
     return [lat, lon]
 
+
 def get_limited_site_codes():
     site_codes = get_site_codes()
     valid_site_codes = []
 
     for site_code in site_codes:
-        site_score, site_confidence = compute_site_stats(site_code)
+        site_stats = compute_site_stats(site_code)
 
-        if site_score is None or site_confidence is None:
+        if site_stats is None:
             continue
 
         valid_site_codes.append(site_code)
 
     return valid_site_codes
 
-def get_marker_msg(site_code, trend, site_score, confidence_label, site_confidence):
-    if site_score is not None and site_confidence is not None:
-        return (
-            f"Site: {site_code}\n"
-            f"Status: {trend}\n"
-            f"Change: {site_score:.2f} ft over last 12 months\n"
-            f"Confidence: {confidence_label} ({site_confidence} bottleneck obs)"
-        )
-    else:
-        return f"Site: {site_code}\nInsufficient data"
+
+def get_marker_msg(site_code, site_stats, trend):
+    if site_stats is None:
+        return f"Site: {site_code}<br>Insufficient data"
+
+    return (
+        f"Site: {site_code}<br>"
+        f"Status: {trend}<br>"
+        f"Change: {site_stats['change']:.2f} ft<br>"
+        f"P-value: {site_stats['p_value']:.3f}"
+    )
+
 
 def add_site_marker(marker_cluster, site_code):
     coords = parse_coordinates(site_code)
 
-    site_score, site_confidence = compute_site_stats(site_code)
-    trend = classify_trend(site_score)
-    confidence_label = classify_confidence(site_confidence)
+    site_stats = compute_site_stats(site_code)
+    if site_stats is None:
+        return
 
-    popup_text = get_marker_msg(site_code, trend, site_score, confidence_label, site_confidence)
+    trend = classify(site_stats["change"], site_stats["p_value"])
+    popup_text = get_marker_msg(site_code, site_stats, trend)
 
     folium.Marker(
         location=coords,
-        popup=popup_text
+        popup=folium.Popup(popup_text, max_width=300),
     ).add_to(marker_cluster)
+
 
 def draw_map():
     min_lat, max_lat = 32.5121 - 5, 42.0126 + 5
@@ -73,14 +79,17 @@ def draw_map():
     for site_code in get_limited_site_codes():
         add_site_marker(marker_cluster, site_code)
 
-    m.save("docs/map.html")
+    m.save(MAP_PATH)
+
 
 def update_index_html():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     latest_date = cur.execute("""
-    SELECT value FROM metadata WHERE key = 'latest_date'
+        SELECT value
+        FROM metadata
+        WHERE key = 'latest_date'
     """).fetchone()
 
     if latest_date is None or latest_date[0] is None:
@@ -97,19 +106,21 @@ def update_index_html():
         else:
             updated_text = f"Updated {delta} days ago"
 
-    with open(INDEX_PATH, "r") as f:
+    with open(INDEX_PATH, "r", encoding="utf-8") as f:
         html = f.read()
 
     html = html.replace("LAST_UPDATED_PLACEHOLDER", updated_text)
 
-    with open(INDEX_PATH, "w") as f:
+    with open(INDEX_PATH, "w", encoding="utf-8") as f:
         f.write(html)
 
     conn.close()
 
+
 def main():
     draw_map()
     update_index_html()
+
 
 if __name__ == "__main__":
     main()
