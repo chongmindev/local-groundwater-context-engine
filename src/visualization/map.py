@@ -1,7 +1,7 @@
 import folium
 from folium.plugins import MarkerCluster
 from src.access.get_measurements import get_site_codes
-from src.compute.site_stats import compute_site_stats, classify_trend, classify_confidence
+from src.compute.site_stats import compute_site_stats, classify
 import random
 import datetime
 import sqlite3
