@@ -10,9 +10,9 @@ def parse_date(msmt_date):
 
 def classify(change, p_value):
     if p_value < 0.05 and change > 0:
-        return "🟡 No Significant Change"
+        return "🟢 Significant Increase"
     elif p_value < 0.05 and change < 0:
-        return "🟢 Significant Improvement"
+        return "🔴 Significant Decrease"
     else:
         return "🟡 No Significant Change"
 
