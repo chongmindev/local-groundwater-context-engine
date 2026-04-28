@@ -38,10 +38,10 @@ def compute_site_stats(site_code):
     if len(pre) < 5 or len(post) < 5:
         return None
 
-    pre_med = sum(pre)/len(pre)
-    post_med = sum(post)/len(post)
+    pre_mean = sum(pre)/len(pre)
+    post_mean = sum(post)/len(post)
 
-    change = post_med - pre_med
+    change = post_mean - pre_mean
 
     stat, p = mannwhitneyu(pre, post, alternative="two-sided")
 
